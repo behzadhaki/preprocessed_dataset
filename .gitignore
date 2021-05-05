@@ -129,4 +129,12 @@ dmypy.json
 .pyre/
 
 # Exclude extracted datasets
-datasets_extracted
+datasets_extracted_locally
+.DS_Store
+.idea/.gitignore
+.idea/inspectionProfiles/
+.idea/misc.xml
+.idea/modules.xml
+.idea/preprocessed_dataset.iml
+.idea/vcs.xml
+datasets_zipped/
