@@ -12,6 +12,9 @@ import note_seq
 import math
 
 # todo append subset to beginning of the tags
+# todo for None cases name the tag as full_set
+# implement sort by samples
+
 class GrooveMidiSubsetter(object):
     def __init__(
             self,
