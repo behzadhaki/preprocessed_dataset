@@ -22,9 +22,9 @@ Currently, the following sets are available:
 
 ### Tools
 
-  1. A python script is also available for unzipping the datasets locally 
+  1. A python script is also available for unzipping the datasets locally. After cloning the repository, run this script to extract datasets locally
     
-    Found in ./extract_locally.py)
+    Found in ./extract_locally.py
 
   2. A set of python classes to create multiple subsets of the complete sets with specific requirements for each subset. 
 
