@@ -14,7 +14,7 @@ Currently, the following sets are available:
 
   1. GrooveMIDI Preprocessed into HVO_Sequences (versions upto 0.3.0) 
   
-    Found in <b> ./datasets_zipped/GrooveMidi/ </b>
+    Found in  ./datasets_zipped/GrooveMidi/ 
     
   2. ...
 
@@ -24,11 +24,11 @@ Currently, the following sets are available:
 
   1. A python script is also available for unzipping the datasets locally 
     
-    Found in <b>./extract_locally.py)<b>
+    Found in ./extract_locally.py)
 
   2. A set of python classes to create multiple subsets of the complete sets with specific requirements for each subset. 
 
-    Code and Documentations can be found in <b> ./preprocessed_dataset/Subset_Creators/</b>
+    Code and Documentations can be found in ./preprocessed_dataset/Subset_Creators/
 
 --------
 
