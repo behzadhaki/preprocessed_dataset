@@ -10,6 +10,7 @@ sys.path.insert(1, "../hvo_sequence")
 from hvo_sequence.hvo_seq import HVO_Sequence                           # required for loading pickles
 import note_seq
 import math
+import numpy as np
 
 # todo append subset to beginning of the tags
 # todo for None cases name the tag as full_set
@@ -22,13 +23,36 @@ class GrooveMidiSubsetter(object):
             subset="GrooveMIDI_processed_test",
             hvo_pickle_filename="hvo_sequence_data.obj",
             list_of_filter_dicts_for_subsets=None,
+            max_len=None
     ):
         self.list_of_filter_dicts_for_subsets = list_of_filter_dicts_for_subsets
         # load preprocessed hvo_sequences from pickle file
         self.pickled_hvo_set_filename = open(os.path.join(pickle_source_path, subset, hvo_pickle_filename), 'rb')
         self.full_hvo_set_pre_filters = pickle.load(self.pickled_hvo_set_filename)
 
-    def create_subsets(self):
+        if max_len is not None:
+            for hvo_seq in self.full_hvo_set_pre_filters:
+                # pad with zeros or trim to match max_len
+                pad_count = max(max_len - hvo_seq.hvo.shape[0], 0)
+                hvo_seq.hvo = np.pad(hvo_seq.hvo, ((0, pad_count), (0, 0)), 'constant')
+                hvo_seq.hvo = hvo_seq.hvo[:max_len, :]  # In case, sequence exceeds max_len
+
+        self.subset_tags = None
+        self.hvo_subsets = None
+
+    def create_subsets(self, force_create=False):
+        """
+        Creates a set of subsets from a hvo_sequence dataset using a set of filters specified in constructor
+
+        :param      force_create: If True, this method re-creates subsets even if it has already done so
+        :return:    subset_tags, hvo_subsets
+        """
+
+        # Don't recreate if already haven't done so ( and if force_create is false)
+        if self.subset_tags is not None and self.hvo_subsets is not None:
+            if len(self.subset_tags) == len(self.hvo_subsets) and force_create is False:
+                return self.subset_tags, self.hvo_subsets
+
         # if no filters, return a SINGLE dataset containing all hvo_seq sequences
         if self.list_of_filter_dicts_for_subsets is None or self.list_of_filter_dicts_for_subsets == [None]:
             hvo_subsets = [self.full_hvo_set_pre_filters]
