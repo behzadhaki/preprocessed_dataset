@@ -29,7 +29,7 @@ def unzip(source_filename, dest_dir):
 
 # Find all zipped files
 zipped_dataset_path_list = []
-for path in Path('datasets_zipped').rglob('*.zip'):
+for path in Path('datasets_zipped/').rglob('*.zip'):
     zipped_dataset_path_list.append(path)
 
 # Create same folder path in another subdirectory called dataset_extracted
