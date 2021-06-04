@@ -12,9 +12,45 @@ import note_seq
 import math
 import numpy as np
 
+from copy import deepcopy
+
 # todo append subset to beginning of the tags
 # todo for None cases name the tag as full_set
 # implement sort by samples
+
+
+class GrooveMidiSubsetterAndSampler(object):
+    def __init__(
+            self,
+            pickle_source_path="datasets_extracted_locally/GrooveMidi/hvo_0.3.0/Processed_On_13_05_2021_at_12_56_hrs",
+            subset="GrooveMIDI_processed_test",
+            hvo_pickle_filename="hvo_sequence_data.obj",
+            list_of_filter_dicts_for_subsets=None,
+            number_of_samples=1024,
+            max_hvo_shape=(32, 27),
+    ):
+        tags_all, subsets_all = GrooveMidiSubsetter(
+            pickle_source_path=pickle_source_path,
+            subset=subset,
+            hvo_pickle_filename=hvo_pickle_filename,
+            list_of_filter_dicts_for_subsets=list_of_filter_dicts_for_subsets,
+            max_len=max_hvo_shape[0]).create_subsets()
+
+        set_sampler = Set_Sampler(
+            tags_all, subsets_all,
+            number_of_samples=number_of_samples,
+            max_hvo_shape=max_hvo_shape)
+
+        self.sampled_tags, self.sampled_subsets = set_sampler.get_sampled_tags_subsets()
+
+        self.hvos_array_tags, self.hvos_array, self.hvo_seq_templates = set_sampler.get_hvos_array()
+
+    def get_subsets(self):
+        return self.sampled_tags, self.sampled_subsets
+
+    def get_hvos_array(self):
+        return self.hvos_array_tags, self.hvos_array, self.hvo_seq_templates
+
 
 class GrooveMidiSubsetter(object):
     def __init__(
@@ -164,3 +200,76 @@ class GrooveMidiSubsetter(object):
                         return False
 
             return True
+
+
+class Set_Sampler(object):
+    def __init__(self, tags_, hvo_subsets_, number_of_samples, max_hvo_shape=(32, 27)):
+        tags = []
+        hvo_subsets = []
+        self.subsets_dict = {}
+
+        total_samples = sum([len(x) for x in hvo_subsets_])
+        number_of_samples = number_of_samples if number_of_samples is not None else total_samples
+
+        # delete empty sets
+        for tag, hvo_subset in zip(tags_, hvo_subsets_):
+            if hvo_subset:
+                tags.append(tag)
+                hvo_subsets.append(hvo_subset)
+
+        # remove empty subsets
+        self.hvos_array_tags = []
+        self.hvos_array = np.zeros((number_of_samples, max_hvo_shape[0], max_hvo_shape[1]))
+        self.hvo_seqs = []
+        self.empty_hvo_seqs = []
+
+        sample_count = 0
+        while sample_count<number_of_samples:
+            # Sample a subset
+            subset_ix = int(np.random.choice(range(len(tags)), 1))
+            tag = tags[subset_ix]
+
+            # Sample an example if subset is not fully emptied out
+            if hvo_subsets[subset_ix]:
+                sample_ix = int(np.random.choice(range(len(hvo_subsets[subset_ix])), 1))
+                hvo_seq = hvo_subsets[subset_ix][sample_ix]
+                if tag not in self.subsets_dict.keys():
+                    self.subsets_dict.update({tag: [deepcopy(hvo_seq)]})
+                else:
+                    self.subsets_dict[tag].append(hvo_seq)
+
+                hvo = hvo_seq.get("hvo")
+                max_time = min(max_hvo_shape[0], hvo.shape[0])
+
+                self.hvos_array[sample_count, :max_time, :] = hvo
+                self.hvos_array_tags.append(tag)
+                self.hvo_seqs.append(hvo_seq)
+                self.empty_hvo_seqs.append(hvo_seq.copy_empty())
+                del (hvo_subsets[subset_ix][sample_ix])  # remove the sample from future selections
+
+                sample_count += 1
+
+        del tags
+        del hvo_subsets
+
+    def get_hvos_array(self):
+        return self.hvos_array_tags, self.hvos_array, self.empty_hvo_seqs
+
+    def get_sampled_tags_subsets(self):
+        return list(self.subsets_dict.keys()), list(self.subsets_dict.values())
+
+
+def convert_hvos_array_to_subsets(hvos_array_tags, hvos_array_predicted, hvo_seqs_templates_):
+    hvo_seqs_templates = deepcopy(hvo_seqs_templates_)
+
+    tags = list(set(hvos_array_tags))
+    temp_dict = {tag: [] for tag in tags}
+
+    for i in range(hvos_array_predicted.shape[0]):
+        hvo_seqs_templates[i].hvo = hvos_array_predicted[i, :, :]
+        temp_dict[hvos_array_tags[i]].append(hvo_seqs_templates[i])
+
+    tags = list(temp_dict.keys())
+    subsets = list(temp_dict.values())
+
+    return tags, subsets
