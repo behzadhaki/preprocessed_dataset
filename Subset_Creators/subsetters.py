@@ -28,13 +28,17 @@ class GrooveMidiSubsetterAndSampler(object):
             list_of_filter_dicts_for_subsets=None,
             number_of_samples=1024,
             max_hvo_shape=(32, 27),
+            at_least_one_hit_in_voices=None         # should be a list of voices where at least 1 hit is required
+                                                    # example:  [0, 1, 2]
+
     ):
         tags_all, subsets_all = GrooveMidiSubsetter(
             pickle_source_path=pickle_source_path,
             subset=subset,
             hvo_pickle_filename=hvo_pickle_filename,
             list_of_filter_dicts_for_subsets=list_of_filter_dicts_for_subsets,
-            max_len=max_hvo_shape[0]).create_subsets()
+            max_len=max_hvo_shape[0],
+            at_least_one_hit_in_voices=at_least_one_hit_in_voices).create_subsets()
 
         set_sampler = Set_Sampler(
             tags_all, subsets_all,
@@ -59,12 +63,14 @@ class GrooveMidiSubsetter(object):
             subset="GrooveMIDI_processed_test",
             hvo_pickle_filename="hvo_sequence_data.obj",
             list_of_filter_dicts_for_subsets=None,
-            max_len=None
+            max_len=None,
+            at_least_one_hit_in_voices=None
     ):
         self.list_of_filter_dicts_for_subsets = list_of_filter_dicts_for_subsets
         # load preprocessed hvo_sequences from pickle file
         self.pickled_hvo_set_filename = open(os.path.join(pickle_source_path, subset, hvo_pickle_filename), 'rb')
         self.full_hvo_set_pre_filters = pickle.load(self.pickled_hvo_set_filename)
+        self.at_least_one_hit_in_voices = at_least_one_hit_in_voices
 
         if max_len is not None:
             for hvo_seq in self.full_hvo_set_pre_filters:
@@ -115,7 +121,13 @@ class GrooveMidiSubsetter(object):
                     subset_tags[subset_ix] = '_AND_'.join(str(x) for x in filter_dict_for_subset.values())
                     for hvo_sample in self.full_hvo_set_pre_filters:
                         if self.does_pass_filter(hvo_sample, filter_dict_for_subset):
-                            hvo_subsets[subset_ix].append(hvo_sample)
+                            if self.at_least_one_hit_in_voices is not None:
+                                # Check that there is at least one hit in the required subset of voices
+                                if 1 in hvo_sample.hvo[:, self.at_least_one_hit_in_voices]:
+                                    hvo_subsets[subset_ix].append(hvo_sample)
+                            else:
+                                hvo_subsets[subset_ix].append(hvo_sample)
+
 
         return subset_tags, hvo_subsets
 
@@ -184,7 +196,6 @@ class GrooveMidiSubsetter(object):
                         feat_value_in_hvo = hvo_sample.metadata.full_midi_filename
                     if filter_key is "full_audio_filename":
                         feat_value_in_hvo = hvo_sample.metadata.full_audio_filename
-
 
                     # Check whether at least one of the current filter_key values is met
                     if not isinstance(filter_values, list):
