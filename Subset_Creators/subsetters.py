@@ -30,7 +30,6 @@ class GrooveMidiSubsetterAndSampler(object):
             max_hvo_shape=(32, 27),
             at_least_one_hit_in_voices=None         # should be a list of voices where at least 1 hit is required
                                                     # example:  [0, 1, 2]
-
     ):
         tags_all, subsets_all = GrooveMidiSubsetter(
             pickle_source_path=pickle_source_path,
