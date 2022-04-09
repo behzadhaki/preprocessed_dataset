@@ -1,0 +1,4 @@
+[submodule "hvo_sequence"]
+	path = hvo_sequence
+	url = git@github.com:behzadhaki/hvo_sequence.git
+	branch = submodules
