@@ -2,7 +2,7 @@
 ####################################################
 # Test 1 -> single subset with all examples
 ####################################################
-from Subset_Creators.subsetters import GrooveMidiSubsetter
+from .subsetters import GrooveMidiSubsetter
 
 gmd_all = GrooveMidiSubsetter(
             pickle_source_path="datasets_extracted_locally/GrooveMidi/hvo_0.3.0/Processed_On_13_05_2021_at_12_56_hrs",
@@ -16,7 +16,7 @@ tags, subsets = gmd_all.create_subsets()
 ####################################################
 # Test 2 -> Separated by styles
 ####################################################
-from Subset_Creators.subsetters import GrooveMidiSubsetter
+from .subsetters import GrooveMidiSubsetter
 
 
 styles = ["afrobeat", "afrocuban", "blues", "country", "dance",
@@ -40,7 +40,7 @@ for ix, (tag, subset) in enumerate(zip(tags_by_style, subsets_by_style)):
 ####################################################
 # Test 3 -> Separated by styles and beat type
 ####################################################
-from Subset_Creators.subsetters import GrooveMidiSubsetter
+from .subsetters import GrooveMidiSubsetter
 
 styles = ["afrobeat", "afrocuban", "blues", "country", "dance",
           "funk", "gospel", "highlife", "hiphop", "jazz",
@@ -67,7 +67,7 @@ for ix, (tag, subset) in enumerate(zip(tags_by_style_and_beat, subsets_by_style_
 # Test 3 -> Separated by styles and beat type
 #                           and time_signature
 ####################################################
-from Subset_Creators.subsetters import GrooveMidiSubsetter
+from .subsetters import GrooveMidiSubsetter
 
 styles = ["afrobeat", "afrocuban", "blues", "country", "dance",
           "funk", "gospel", "highlife", "hiphop", "jazz",
@@ -93,7 +93,7 @@ for ix, (tag, subset) in enumerate(zip(tags_by_style_and_beat, subsets_by_style_
 ####################################################
 # Test 4 -> Multiple feature values for a feature
 ####################################################
-from Subset_Creators.subsetters import GrooveMidiSubsetter
+from .subsetters import GrooveMidiSubsetter
 
 styles = ["afrobeat", "afrocuban", "blues", "country", "dance",
           "funk", "gospel", "highlife", "hiphop", "jazz",
@@ -119,7 +119,7 @@ for ix, (tag, subset) in enumerate(zip(tags_by_style_and_beat, subsets_by_style_
 ###############################################
 
 # FIXME these filters give error
-from Subset_Creators.subsetters import GrooveMidiSubsetter
+from .subsetters import GrooveMidiSubsetter
 
 gmd_1 = GrooveMidiSubsetter(
             pickle_source_path="datasets_extracted_locally/GrooveMidi/hvo_0.3.0/Processed_On_13_05_2021_at_12_56_hrs",
