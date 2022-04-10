@@ -1,4 +1,3 @@
-[submodule "hvo_sequence"]
-	path = hvo_sequence
+[submodule "Subset_Creators/hvo_sequence"]
+	path = Subset_Creators/hvo_sequence
 	url = git@github.com:behzadhaki/hvo_sequence.git
-	branch = submodules

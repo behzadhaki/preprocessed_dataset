@@ -7,7 +7,7 @@ import sys
 #sys.path.insert(1, "../../hvo_sequence")
 #sys.path.insert(1, "../hvo_sequence")
 
-from ..hvo_sequence import HVO_Sequence                           # required for loading pickles
+from .hvo_sequence import HVO_Sequence
 import note_seq
 import math
 import numpy as np
