@@ -2,8 +2,10 @@ import pickle
 import os
 import numpy as np
 from copy import deepcopy
+import sys
 
-from src.preprocessed_dataset.Subset_Creators import hvo_sequence
+sys.path.append("../")
+from hvo_sequence import HVO_Sequence
 
 
 # todo append subset to beginning of the tags
