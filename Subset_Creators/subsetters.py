@@ -21,7 +21,7 @@ class GrooveMidiSubsetterAndSampler(object):
         list_of_filter_dicts_for_subsets=None,
         number_of_samples=1024,
         max_hvo_shape=(32, 27),
-        at_least_one_hit_in_voices=None  # should be a list of voices where at least 1 hit is required
+        at_least_one_hit_in_voices=None  # should be a list of voices where at least 1 hit == required
         # example:  [0, 1, 2]
     ):
         tags_all, subsets_all = GrooveMidiSubsetter(
@@ -73,7 +73,7 @@ class GrooveMidiSubsetter(object):
         self.full_hvo_set_pre_filters = pickle.load(self.pickled_hvo_set_filename)
         self.at_least_one_hit_in_voices = at_least_one_hit_in_voices
 
-        if max_len is not None:
+        if max_len != None:
             for hvo_seq in self.full_hvo_set_pre_filters:
                 # pad with zeros or trim to match max_len
                 pad_count = max(max_len - hvo_seq.hvo.shape[0], 0)
@@ -93,14 +93,14 @@ class GrooveMidiSubsetter(object):
         :return:    subset_tags, hvo_subsets
         """
 
-        # Don't recreate if already haven't done so ( and if force_create is false)
-        if self.subset_tags is not None and self.hvo_subsets is not None:
-            if len(self.subset_tags) == len(self.hvo_subsets) and force_create is False:
+        # Don't recreate if already haven't done so ( and if force_create == false)
+        if self.subset_tags != None and self.hvo_subsets != None:
+            if len(self.subset_tags) == len(self.hvo_subsets) and force_create == False:
                 return self.subset_tags, self.hvo_subsets
 
         # if no filters, return a SINGLE dataset containing all hvo_seq sequences
         if (
-            self.list_of_filter_dicts_for_subsets is None
+            self.list_of_filter_dicts_for_subsets == None
             or self.list_of_filter_dicts_for_subsets == [None]
         ):
             hvo_subsets = [self.full_hvo_set_pre_filters]
@@ -116,12 +116,12 @@ class GrooveMidiSubsetter(object):
             for subset_ix, filter_dict_for_subset in enumerate(
                 self.list_of_filter_dicts_for_subsets
             ):
-                # if current filter is None or a dict with None values
+                # if current filter == None or a dict with None values
                 # add all the dataset in its entirety to current subset
-                if filter_dict_for_subset is None:
+                if filter_dict_for_subset == None:
                     hvo_subsets[subset_ix] = self.full_hvo_set_pre_filters
                 elif isinstance(filter_dict_for_subset, dict) and all(
-                    value is None for value in filter_dict_for_subset.values()
+                    value == None for value in filter_dict_for_subset.values()
                 ):
                     hvo_subsets[subset_ix] = self.full_hvo_set_pre_filters
 
@@ -132,8 +132,8 @@ class GrooveMidiSubsetter(object):
                     )
                     for hvo_sample in self.full_hvo_set_pre_filters:
                         if self.does_pass_filter(hvo_sample, filter_dict_for_subset):
-                            if self.at_least_one_hit_in_voices is not None:
-                                # Check that there is at least one hit in the required subset of voices
+                            if self.at_least_one_hit_in_voices != None:
+                                # Check that there == at least one hit in the required subset of voices
                                 if (
                                     1
                                     in hvo_sample.hvo[
@@ -158,7 +158,7 @@ class GrooveMidiSubsetter(object):
 
         # Start checking each hvo_sample feature against the specified values in filter
         for (filter_key, filter_values) in filter_dict.items():
-            if filter_key is "time_signature":
+            if filter_key == "time_signature":
                 sample_passes_filter = []
                 for time_signature in filter_dict[filter_key]:
                     numerator = int(time_signature.split("-")[0])
@@ -173,7 +173,7 @@ class GrooveMidiSubsetter(object):
                 if not any(sample_passes_filter):  # no need to check
                     return False
 
-            elif filter_key is "bpm":
+            elif filter_key == "bpm":
                 sample_passes_filter = []
                 for bpm_lower_b, bpm_upper_b in filter_dict[filter_key]:
                     if bpm_lower_b < hvo_sample.tempos[0].qpm < bpm_upper_b:
@@ -183,7 +183,7 @@ class GrooveMidiSubsetter(object):
                 if not any(sample_passes_filter):
                     return False
 
-            elif filter_key is "number_of_instruments":
+            elif filter_key == "number_of_instruments":
                 sample_passes_filter = []
                 for n_instruments_lower_bound, n_instruments_upper_bound in filter_dict[
                     filter_key
@@ -203,26 +203,26 @@ class GrooveMidiSubsetter(object):
 
                 feat_value_in_hvo = []
 
-                if filter_key is "drummer":
+                if filter_key == "drummer":
                     feat_value_in_hvo = hvo_sample.metadata.drummer
-                if filter_key is "session":
+                if filter_key == "session":
                     feat_value_in_hvo = hvo_sample.metadata.session
-                if filter_key is "loop_id":
+                if filter_key == "loop_id":
                     feat_value_in_hvo = hvo_sample.metadata.loop_id
-                if filter_key is "master_id":
+                if filter_key == "master_id":
                     feat_value_in_hvo = hvo_sample.metadata.master_id
-                if filter_key is "style_primary":
+                if filter_key == "style_primary":
                     feat_value_in_hvo = hvo_sample.metadata.style_primary
-                if filter_key is "style_secondary":
+                if filter_key == "style_secondary":
                     feat_value_in_hvo = hvo_sample.metadata.style_secondary
-                if filter_key is "beat_type":
+                if filter_key == "beat_type":
                     feat_value_in_hvo = hvo_sample.metadata.beat_type
-                if filter_key is "full_midi_filename":
+                if filter_key == "full_midi_filename":
                     feat_value_in_hvo = hvo_sample.metadata.full_midi_filename
-                if filter_key is "full_audio_filename":
+                if filter_key == "full_audio_filename":
                     feat_value_in_hvo = hvo_sample.metadata.full_audio_filename
 
-                # Check whether at least one of the current filter_key values is met
+                # Check whether at least one of the current filter_key values == met
                 if not isinstance(filter_values, list):
                     filter_values = [[filter_values]]
                 else:
@@ -248,7 +248,7 @@ class Set_Sampler(object):
 
         total_samples = sum([len(x) for x in hvo_subsets_])
         number_of_samples = (
-            number_of_samples if number_of_samples is not None else total_samples
+            number_of_samples if number_of_samples != None else total_samples
         )
 
         # delete empty sets
@@ -271,7 +271,7 @@ class Set_Sampler(object):
             subset_ix = int(np.random.choice(range(len(tags)), 1))
             tag = tags[subset_ix]
 
-            # Sample an example if subset is not fully emptied out
+            # Sample an example if subset != fully emptied out
             if hvo_subsets[subset_ix]:
                 sample_ix = int(np.random.choice(range(len(hvo_subsets[subset_ix])), 1))
                 hvo_seq = hvo_subsets[subset_ix][sample_ix]
