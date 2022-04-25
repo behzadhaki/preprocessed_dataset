@@ -4,7 +4,7 @@ import numpy as np
 from copy import deepcopy
 import sys
 
-from ...hvo_sequence import HVO_Sequence
+from hvo_sequence import HVO_Sequence
 
 
 # todo append subset to beginning of the tags
